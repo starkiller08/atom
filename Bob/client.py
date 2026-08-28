@@ -45,16 +45,21 @@ def receiver(sock, ssk):
 
 
 def send_msg(sock, ssk, m, to_addr):
-    h = hl.sha1(ssk + m.encode()).digest()
-    c = rc4(ssk, m.encode() + h)
-    sock.sendto(b64.b64encode(c), to_addr)
+	h = hl.sha1(ssk + m.encode()).digest()
+	nonce = os.urandom(16)
+	mk = hl.sha1(ssk + nonce).digest()
+	c = rc4(mk, m.encode() + h)
+	sock.sendto(b64.b64encode(nonce + c), to_addr)
 
 def recv_msg(sock, ssk):
 	try:
 		data, a = sock.recvfrom(4096)
 	except s.timeout:
 		return 'TIMEOUT'
-	blob = rc4(ssk, b64.b64decode(data))
+	raw = b64.b64decode(data)
+	nonce, c = raw[:16], raw[16:]
+	mk = hl.sha1(ssk + nonce).digest()
+	blob = rc4(mk, c)
 	m, h = blob[:-20], blob[-20:]
 	if hl.sha1(ssk + m).digest() == h:
 		return m.decode()
