@@ -8,6 +8,8 @@ from Crypto.Cipher import PKCS1_OAEP as pkcs1_oaep
 import threading as tdg
 
 
+running = {'ok': True}
+
 
 def rc4(key, data):
 	S = list(range(256))
@@ -30,12 +32,14 @@ def rc4(key, data):
 
 
 def receiver(sock, ssk):
-    while True:
-        r = recv_msg(sock, ssk)
-        if r is None:
-            print('Decryption Error')
-        else:
-            print('\n[Alice]', r)
+	while running['ok']:
+		r = recv_msg(sock, ssk)
+		if r == 'TIMEOUT':
+			continue
+		if r is None:
+			print('Decryption Error')
+		else:
+			print('\n[Alice]', r)
 
 
 
@@ -46,25 +50,34 @@ def send_msg(sock, ssk, m, to_addr):
     sock.sendto(b64.b64encode(c), to_addr)
 
 def recv_msg(sock, ssk):
-    data, a = sock.recvfrom(4096)
-    blob = rc4(ssk, b64.b64decode(data))
-    m, h = blob[:-20], blob[-20:]
-    if hl.sha1(ssk + m).digest() == h:
-        return m.decode()
-    return None
+	try:
+		data, a = sock.recvfrom(4096)
+	except s.timeout:
+		return 'TIMEOUT'
+	blob = rc4(ssk, b64.b64decode(data))
+	m, h = blob[:-20], blob[-20:]
+	if hl.sha1(ssk + m).digest() == h:
+		return m.decode()
+	return None
 
 
 
 sock = s.socket(s.AF_INET, s.SOCK_DGRAM)
 sock.bind(('127.0.0.1', 2222))
+sock.settimeout(10.0)
+
 
 nb = os.urandom(16)
 sock.sendto(j.dumps({'msg':1,'user':input('Username: '),'nb':b64.b64encode(nb).decode()}).encode(), ('127.0.0.1', 1111))
 print('Connection request sent...')
 
-data, addr = sock.recvfrom(4096)
-
+try:
+	data, addr = sock.recvfrom(4096)
+except s.timeout:
+	print('No response from Host - terminating')
+	exit()
 print(f'Data sent.... {data} {addr}')
+
 
 
 m2 = j.loads(data.decode())
@@ -72,8 +85,8 @@ pk_bytes = b64.b64decode(m2['pk'])
 na = b64.b64decode(m2['na'])
 fp = open('Bob/alice_public_key_fingerprint.txt').read().strip()
 if hl.sha1(pk_bytes).hexdigest() != fp:
-    print('Fingerprint mismatch - terminating')
-    exit()
+	print('Fingerprint mismatch - terminating')
+	exit()
 print('Host public key verified')
 
 
@@ -84,11 +97,15 @@ c1 = cipher.encrypt(pw.encode() + k)
 sock.sendto(j.dumps({'msg':3,'c1':b64.b64encode(c1).decode()}).encode(), ('127.0.0.1',1111))
 
 
-data, addr = sock.recvfrom(4096)
+try:
+	data, addr = sock.recvfrom(4096)
+except s.timeout:
+	print('No response from Host --> terminating')
+	exit()
 result = data.decode()
 print(result)
 if result != 'Connection Okay':
-    exit()
+	exit()
 ssk = hl.sha1(k + nb + na).digest()
 print('Session key established')
 
@@ -99,7 +116,7 @@ t.start()
 
 
 while True:
-    m = input()
-    send_msg(sock, ssk, m, ('127.0.0.1', 1111))
-    if m == 'exit':
-        break
+	m = input()
+	send_msg(sock, ssk, m, ('127.0.0.1', 1111))
+	if m == 'exit':
+		break
