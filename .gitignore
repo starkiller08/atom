@@ -1,0 +1,3 @@
+*.pem
+passwords.txt
+alice_public_key_fingerprint.txt
