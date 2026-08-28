@@ -11,7 +11,7 @@ print('Generating Private Key')
 alice_private_key = rsa.generate(2048)
 alice_private_key_bytes = alice_private_key.export_key()
 
-print('Generating Public Key')
+print('Generating Public Key\n')
 alice_public_key = alice_private_key.publickey()
 alice_public_key_bytes = alice_public_key.export_key()
 
@@ -25,7 +25,7 @@ with open('Alice/alice_private_key.pem', 'wb') as f:
 
 
 with open('Alice/alice_public_key.pem', 'wb') as f:
-	print('Saving file "alice_public_key.pem" to folder "Alice"')
+	print('Saving file "alice_public_key.pem" to folder "Alice"\n')
 	f.write(alice_public_key_bytes)
 
 
@@ -35,7 +35,7 @@ alice_public_key_hash = hl.sha1(alice_public_key_bytes).hexdigest()
 
 os.makedirs('Bob', exist_ok=True)
 with open('Bob/alice_public_key_fingerprint.txt', 'w') as f:
-	print('Saving file "alice_public_key_fingerprint" to folder "Bob"')
+	print('Saving file "alice_public_key_fingerprint" to folder "Bob"\n')
 	f.write(alice_public_key_hash)
 
 
