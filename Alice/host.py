@@ -41,5 +41,10 @@ pw_recv, k = blob[:8], blob[8:]
 rec = open('Alice/passwords.txt').read().strip().split(':')
 if hl.sha1(pw_recv).hexdigest() == rec[1]:
     print('Password verified')
+    sock.sendto(b'Connection Okay', addr)
+    ssk = hl.sha1(k + nb + na).digest()
+    print('Session key established')
 else:
     print('Password incorrect')
+    sock.sendto(b'Connection Failed', addr)
+    exit()

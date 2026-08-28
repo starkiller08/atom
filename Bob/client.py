@@ -34,3 +34,12 @@ k = os.urandom(16)
 cipher = pkcs1_oaep.new(rsa.import_key(pk_bytes))
 c1 = cipher.encrypt(pw.encode() + k)
 sock.sendto(j.dumps({'msg':3,'c1':b64.b64encode(c1).decode()}).encode(), ('127.0.0.1',1111))
+
+
+data, addr = sock.recvfrom(4096)
+result = data.decode()
+print(result)
+if result != 'Connection Okay':
+    exit()
+ssk = hl.sha1(k + nb + na).digest()
+print('Session key established')
