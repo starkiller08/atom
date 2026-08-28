@@ -5,6 +5,54 @@ import base64 as b64
 import hashlib as hl
 from Crypto.PublicKey import RSA as rsa
 from Crypto.Cipher import PKCS1_OAEP as pkcs1_oaep
+import threading as tdg
+
+
+
+def rc4(key, data):
+	S = list(range(256))
+	jj = 0
+	for i in range(256):
+		jj = (jj + S[i] + key[i % len(key)]) % 256
+		S[i], S[jj] = S[jj], S[i]
+
+
+	i = 0
+	jj = 0
+	out = bytearray()
+	for byte in data:
+		i = (i + 1) % 256
+		jj = (jj + S[i]) % 256
+		S[i], S[jj] = S[jj], S[i]
+		ks = S[(S[i] + S[jj]) % 256]
+		out.append(byte ^ ks)
+	return bytes(out)
+
+
+def receiver(sock, ssk):
+    while True:
+        r = recv_msg(sock, ssk)
+        if r is None:
+            print('Decryption Error')
+        else:
+            print('\n[Alice]', r)
+
+
+
+
+def send_msg(sock, ssk, m, to_addr):
+    h = hl.sha1(ssk + m.encode()).digest()
+    c = rc4(ssk, m.encode() + h)
+    sock.sendto(b64.b64encode(c), to_addr)
+
+def recv_msg(sock, ssk):
+    data, a = sock.recvfrom(4096)
+    blob = rc4(ssk, b64.b64decode(data))
+    m, h = blob[:-20], blob[-20:]
+    if hl.sha1(ssk + m).digest() == h:
+        return m.decode()
+    return None
+
 
 
 sock = s.socket(s.AF_INET, s.SOCK_DGRAM)
@@ -43,3 +91,15 @@ if result != 'Connection Okay':
     exit()
 ssk = hl.sha1(k + nb + na).digest()
 print('Session key established')
+
+
+t = tdg.Thread(target=receiver, args=(sock, ssk), daemon=True)
+t.start()
+
+
+
+while True:
+    m = input()
+    send_msg(sock, ssk, m, ('127.0.0.1', 1111))
+    if m == 'exit':
+        break
