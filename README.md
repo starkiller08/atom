@@ -19,11 +19,11 @@ Install with:
 **Files**
 
 
-key_setup.py 			Generate Alice's RSA key pair, stores the public key fingerprint in Bob's directory, and creates the password file in Alice's directory.
+key_setup.py 			*(Generate Alice's RSA key pair, stores the public key fingerprint in Bob's directory, and creates the password file in Alice's directory.)*
 
-Alice/host.py 			The Host program, run by Alice.
+Alice/host.py 			*(The Host program, run by Alice.)*
 
-Bob/client.py 			The Client program, run by Bob.
+Bob/client.py 			*(The Client program, run by Bob.)*
 
 --------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ typing "exit" is treated as an ordinary message.
 
 **PORTS**
 
-Host:   127.0.0.1 port 1111
+Host:   127.0.0.1 port 1111<br>
 Client: 127.0.0.1 port 2222
 
 -------------------------------------------------------------------------------
