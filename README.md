@@ -5,7 +5,7 @@ CSCI368 Network Security - Assignment 1
 
 -------------------------------------------------------------------------------
 
-Requirements
+**Requirements**
 
 
 Python 3.10 or later
@@ -16,7 +16,7 @@ Install with:
 
 -------------------------------------------------------------------------------
 
-Files
+**Files**
 
 
 key_setup.py 			Generate Alice's RSA key pair, stores the public key fingerprint in Bob's directory, and creates the password file in Alice's directory.
@@ -27,7 +27,7 @@ Bob/client.py 			The Client program, run by Bob.
 
 --------------------------------------------------------------------------------
 
-How To Run
+**How To Run**
 
 
 All commands must be run from the assignment1 directory
@@ -61,15 +61,14 @@ typing "exit" is treated as an ordinary message.
 
 -------------------------------------------------------------------------------
 
-PORTS
+**PORTS**
 
--------------------------------------------------------------------------------
 Host:   127.0.0.1 port 1111
 Client: 127.0.0.1 port 2222
 
 -------------------------------------------------------------------------------
 
-IMPLEMENTATION NOTES
+**IMPLEMENTATION NOTES**
 
 -------------------------------------------------------------------------------
 Protocol messages are sent as JSON. Binary values (nonces,
@@ -96,7 +95,7 @@ sent and received at any time rather than in strict turns.
 
 -------------------------------------------------------------------------------
 
-KNOWN LIMITATIONS
+**KNOWN LIMITATIONS**
 
 -------------------------------------------------------------------------------
 - The programs must be run from the assignment1 directory
