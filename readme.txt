@@ -15,6 +15,7 @@ Install with:
 
 Files
 
+assignment1/			The folder where the below listed files are stored
 
 key_setup.py 			Generate Alice's RSA key pair, stores the public key fingerprint in Bob's directory, and creates the password file in Alice's directory.
 
@@ -30,7 +31,7 @@ How To Run
 All commands must be run from the assignment1 directory
 (the directory containing this readme).
 
-Step 1 - Run the key setup once:
+Step 1 - Switch to the assignment 1 folder and Run the key setup once:
 
     python3 key_setup.py
 
